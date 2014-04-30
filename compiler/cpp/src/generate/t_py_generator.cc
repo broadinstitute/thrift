@@ -338,11 +338,18 @@ void t_py_generator::init_generator() {
   f_init.close();
 
   // Print header
-  f_types_ << py_autogen_comment() << endl << py_imports() << endl << render_includes() << endl
-           << render_fastbinary_includes() << endl << endl;
+  f_types_ <<
+    py_autogen_comment() << endl <<
+    py_imports() << endl <<
+    render_includes() << endl <<
+    render_fastbinary_includes() <<
+    endl << endl;
 
-  f_consts_ << py_autogen_comment() << endl << py_imports() << endl << "from ttypes import *"
-            << endl << endl;
+  f_consts_ <<
+    py_autogen_comment() << endl <<
+    py_imports() << endl <<
+    "from .ttypes import *" << endl <<
+    endl;
 }
 
 /**
@@ -945,8 +952,10 @@ void t_py_generator::generate_service(t_service* tservice) {
                << tservice->get_extends()->get_name() << endl;
   }
 
-  f_service_ << "from ttypes import *" << endl << "from thrift.Thrift import TProcessor" << endl
-             << render_fastbinary_includes() << endl;
+  f_service_ <<
+    "from .ttypes import *" << endl <<
+    "from thrift.Thrift import TProcessor" << endl <<
+    render_fastbinary_includes() << endl;
 
   if (gen_twisted_) {
     f_service_ << "from zope.interface import Interface, implements" << endl
@@ -1392,21 +1401,33 @@ void t_py_generator::generate_service_remote(t_service* tservice) {
   ofstream f_remote;
   f_remote.open(f_remote_name.c_str());
 
-  f_remote << "#!/usr/bin/env python" << endl << py_autogen_comment() << endl << "import sys"
-           << endl << "import pprint" << endl << "from urlparse import urlparse" << endl
-           << "from thrift.transport import TTransport" << endl
-           << "from thrift.transport import TSocket" << endl
-           << "from thrift.transport import TSSLSocket" << endl
-           << "from thrift.transport import THttpClient" << endl
-           << "from thrift.protocol import TBinaryProtocol" << endl << endl;
+  f_remote <<
+    "#!/usr/bin/env python" << endl <<
+    py_autogen_comment() << endl <<
+    "import sys" << endl <<
+    "import pprint" << endl <<
+    "if sys.version_info[0] == 3:" << endl <<
+    "  from urllib.parse import urlparse" << endl <<
+    "else:" << endl <<
+    "  from urlparse import urlparse" << endl <<
+    "from thrift.transport import TTransport" << endl <<
+    "from thrift.transport import TSocket" << endl <<
+    "from thrift.transport import TSSLSocket" << endl <<
+    "from thrift.transport import THttpClient" << endl <<
+    "from thrift.protocol import TBinaryProtocol" << endl <<
+    endl;
 
-  f_remote << "from " << module_ << " import " << service_name_ << endl << "from " << module_
-           << ".ttypes import *" << endl << endl;
+  f_remote <<
+    "from " << module_ << " import " << service_name_ << endl <<
+    "from " << module_ << ".ttypes import *" << endl <<
+    endl;
 
-  f_remote << "if len(sys.argv) <= 1 or sys.argv[1] == '--help':" << endl << "  print('')" << endl
-           << "  print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] "
-              "function [arg1 [arg2...]]')" << endl << "  print('')" << endl
-           << "  print('Functions:')" << endl;
+  f_remote <<
+    "if len(sys.argv) <= 1 or sys.argv[1] == '--help':" << endl <<
+    "  print('')" << endl <<
+    "  print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] function [arg1 [arg2...]]')" << endl <<
+    "  print('')" << endl <<
+    "  print('Functions:')" << endl;
   for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
     f_remote << "  print('  " << (*f_iter)->get_returntype()->get_name() << " "
              << (*f_iter)->get_name() << "(";
@@ -1701,8 +1722,8 @@ void t_py_generator::generate_process_function(t_service* tservice, t_function* 
       // Kinda absurd
       f_service_ << indent() << "  error.raiseException()" << endl;
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
-        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << ", "
-                   << (*x_iter)->get_name() << ":" << endl;
+        f_service_ <<
+          indent() << "except " << type_name((*x_iter)->get_type()) << " as " << (*x_iter)->get_name() << ":" << endl;
         if (!tfunction->is_oneway()) {
           indent_up();
           f_service_ << indent() << "result." << (*x_iter)->get_name() << " = "
@@ -1828,8 +1849,8 @@ void t_py_generator::generate_process_function(t_service* tservice, t_function* 
     if (!tfunction->is_oneway() && xceptions.size() > 0) {
       indent_down();
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
-        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << ", "
-                   << (*x_iter)->get_name() << ":" << endl;
+        f_service_ <<
+          indent() << "except " << type_name((*x_iter)->get_type()) << " as " << (*x_iter)->get_name() << ":" << endl;
         if (!tfunction->is_oneway()) {
           indent_up();
           f_service_ << indent() << "result." << (*x_iter)->get_name() << " = "
