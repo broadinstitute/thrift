@@ -69,7 +69,7 @@ class JSONBaseContext(object):
 
   def doIO(self, function):
     pass
-  
+
   def write(self):
     pass
 
@@ -84,7 +84,7 @@ class JSONBaseContext(object):
 
 
 class JSONListContext(JSONBaseContext):
-    
+
   def doIO(self, function):
     if self.first is True:
       self.first = False
@@ -99,7 +99,7 @@ class JSONListContext(JSONBaseContext):
 
 
 class JSONPairContext(JSONBaseContext):
-  
+
   def __init__(self, protocol):
     super(JSONPairContext, self).__init__(protocol)
     self.colon = True
@@ -429,12 +429,12 @@ class TJSONProtocol(TJSONProtocolBase):
   def writeMapEnd(self):
     self.writeJSONObjectEnd()
     self.writeJSONArrayEnd()
-    
+
   def writeListBegin(self, etype, size):
     self.writeJSONArrayStart()
     self.writeJSONString(CTYPES[etype])
     self.writeJSONNumber(size)
-    
+
   def writeListEnd(self):
     self.writeJSONArrayEnd()
 
@@ -442,7 +442,7 @@ class TJSONProtocol(TJSONProtocolBase):
     self.writeJSONArrayStart()
     self.writeJSONString(CTYPES[etype])
     self.writeJSONNumber(size)
-    
+
   def writeSetEnd(self):
     self.writeJSONArrayEnd()
 
@@ -470,7 +470,7 @@ class TJSONProtocol(TJSONProtocolBase):
 
   def writeString(self, string):
     self.writeJSONString(string)
-    
+
   def writeBinary(self, binary):
     self.writeJSONBase64(binary)
 
@@ -483,49 +483,49 @@ class TJSONProtocolFactory:
 
 class TSimpleJSONProtocol(TJSONProtocolBase):
     """Simple, readable, write-only JSON protocol.
-    
+
     Useful for interacting with scripting languages.
     """
 
     def readMessageBegin(self):
         raise NotImplementedError()
-    
+
     def readMessageEnd(self):
         raise NotImplementedError()
-    
+
     def readStructBegin(self):
         raise NotImplementedError()
-    
+
     def readStructEnd(self):
         raise NotImplementedError()
-    
+
     def writeMessageBegin(self, name, request_type, seqid):
         self.resetWriteContext()
-    
+
     def writeMessageEnd(self):
         pass
-    
+
     def writeStructBegin(self, name):
         self.writeJSONObjectStart()
-    
+
     def writeStructEnd(self):
         self.writeJSONObjectEnd()
-      
+
     def writeFieldBegin(self, name, ttype, fid):
         self.writeJSONString(name)
-    
+
     def writeFieldEnd(self):
         pass
-    
+
     def writeMapBegin(self, ktype, vtype, size):
         self.writeJSONObjectStart()
-    
+
     def writeMapEnd(self):
         self.writeJSONObjectEnd()
-    
+
     def _writeCollectionBegin(self, etype, size):
         self.writeJSONArrayStart()
-    
+
     def _writeCollectionEnd(self):
         self.writeJSONArrayEnd()
     writeListBegin = _writeCollectionBegin
@@ -554,10 +554,10 @@ class TSimpleJSONProtocol(TJSONProtocolBase):
 
     def writeDouble(self, dbl):
         self.writeJSONNumber(dbl)
-    
+
     def writeString(self, string):
         self.writeJSONString(string)
-      
+
     def writeBinary(self, binary):
         self.writeJSONBase64(binary)
 
